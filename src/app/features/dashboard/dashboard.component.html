@@ -1,0 +1,41 @@
+<div class="dashboard-container">
+    <header class="dashboard-header">
+      <div class="brand">
+        <h1>Auto Service Portal</h1>
+      </div>
+      <div class="user-controls">
+        <span class="welcome-message">Welcome, {{ username }}</span>
+        <button class="logout-btn" (click)="logout()">Logout</button>
+    </div>
+</header>
+
+<div class="dashboard-content">
+  <div class="sidebar">
+    <h3>Navigation</h3>
+    <ul class="nav-items">
+      <li class="nav-item">
+        <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Dashboard</a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/profile">Profile</a>
+      </li>
+      <li *ngIf="userRole === 'ADMIN'" class="nav-item">
+        <a routerLink="/admin">Admin Panel</a>
+      </li>
+    </ul>
+  </div>
+
+  <main class="main-content">
+    <ng-container [ngSwitch]="userRole">
+      <app-admin-dashboard *ngSwitchCase="'ROLE_ADMIN'"></app-admin-dashboard>
+      <app-car-owner-dashboard *ngSwitchCase="'ROLE_CAR_OWNER'"></app-car-owner-dashboard>
+      <app-mechanic-dashboard *ngSwitchCase="'ROLE_MECHANIC'"></app-mechanic-dashboard>
+      <app-part-dealer-dashboard *ngSwitchCase="'ROLE_PART_DEALER'"></app-part-dealer-dashboard>
+      <div *ngSwitchDefault class="role-error">
+        <h2>Role not recognized</h2>
+        <p>Please contact support for assistance.</p>
+      </div>
+    </ng-container>
+  </main>
+</div>
+</div>

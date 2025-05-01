@@ -1,0 +1,75 @@
+<div class="part-dealer-dashboard">
+    <h2>Part Dealer Dashboard</h2>
+    
+    <div class="dashboard-section">
+      <div class="section-header">
+        <h3>Inventory Management</h3>
+        <button class="add-btn">Add New Part</button>
+      </div>
+      
+      <div class="inventory-table">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of inventory">
+              <td>{{ item.id }}</td>
+              <td>{{ item.name }}</td>
+              <td>{{ item.category }}</td>
+              <td>${{ item.price.toFixed(2) }}</td>
+              <td>{{ item.stock }}</td>
+              <td>
+                <span class="stock-status" 
+                  [ngClass]="{'low-stock': item.stock < lowStockThreshold, 'in-stock': item.stock >= lowStockThreshold}">
+                  {{ item.stock < lowStockThreshold ? 'Low Stock' : 'In Stock' }}
+                </span>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button class="action-btn">Edit</button>
+                  <button class="action-btn">Restock</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div class="dashboard-section">
+      <div class="section-header">
+        <h3>Quick Actions</h3>
+      </div>
+      
+      <div class="quick-actions">
+        <button class="quick-action-btn">
+          <span class="icon">📦</span>
+          <span>Manage Orders</span>
+        </button>
+        
+        <button class="quick-action-btn">
+          <span class="icon">🔍</span>
+          <span>Check Inventory</span>
+        </button>
+        
+        <button class="quick-action-btn">
+          <span class="icon">📊</span>
+          <span>Sales Reports</span>
+        </button>
+        
+        <button class="quick-action-btn">
+          <span class="icon">👥</span>
+          <span>Customer Requests</span>
+        </button>
+      </div>
+    </div>
+  </div>

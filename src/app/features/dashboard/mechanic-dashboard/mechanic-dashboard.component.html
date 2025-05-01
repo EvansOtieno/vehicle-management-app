@@ -1,0 +1,68 @@
+<div class="mechanic-dashboard">
+    <h2>Mechanic Dashboard</h2>
+    
+    <div class="stats-container">
+      <div class="stat-card">
+        <h3>Completed Services</h3>
+        <div class="stat-value">{{ stats.completed }}</div>
+      </div>
+      
+      <div class="stat-card">
+        <h3>Upcoming Appointments</h3>
+        <div class="stat-value">{{ stats.upcoming }}</div>
+      </div>
+      
+      <div class="stat-card">
+        <h3>Average Rating</h3>
+        <div class="stat-value">{{ stats.rating }}/5</div>
+      </div>
+    </div>
+    
+    <div class="dashboard-section">
+      <div class="section-header">
+        <h3>Today's Appointments</h3>
+      </div>
+      
+      <div class="appointments-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Customer</th>
+              <th>Vehicle</th>
+              <th>Service</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let appointment of appointments">
+              <td>{{ appointment.time }}</td>
+              <td>{{ appointment.customer }}</td>
+              <td>{{ appointment.vehicle }}</td>
+              <td>{{ appointment.service }}</td>
+              <td>
+                <span class="status-badge" 
+                  [ngClass]="{
+                    'status-pending': appointment.status === 'Pending', 
+                    'status-confirmed': appointment.status === 'Confirmed',
+                    'status-completed': appointment.status === 'Completed'
+                  }">
+                  {{ appointment.status }}
+                </span>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button class="action-btn">Details</button>
+                  <button class="action-btn success">Complete</button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="appointments.length === 0">
+              <td colspan="6" class="empty-state">No appointments scheduled for today.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>

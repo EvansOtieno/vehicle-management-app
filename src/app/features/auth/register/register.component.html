@@ -1,0 +1,110 @@
+<div class="register-container">
+    <div class="register-card">
+      <h2>Create Account</h2>
+      
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input 
+              type="text" 
+              id="firstName" 
+              formControlName="firstName" 
+              placeholder="Enter first name"
+              class="form-control">
+          </div>
+          
+          <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input 
+              type="text" 
+              id="lastName" 
+              formControlName="lastName" 
+              placeholder="Enter last name"
+              class="form-control">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="phoneNumber">Phone Number*</label>
+          <input 
+            type="text" 
+            id="phonenumber" 
+            formControlName="phoneNumber" 
+            placeholder="Enter your phone number"
+            class="form-control">
+          <div *ngIf="registerForm.get('phoneNumber')?.invalid && registerForm.get('phoneNumber')?.touched" class="error-message">
+            <span *ngIf="registerForm.get('phoneNumber')?.errors?.['required']">Phone Number is required</span>
+            <span *ngIf="registerForm.get('phoneNumber')?.errors?.['minlength']">Phone Number must be at least 10 characters</span>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email*</label>
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email" 
+            placeholder="Enter your email"
+            class="form-control">
+          <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="error-message">
+            <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required</span>
+            <span *ngIf="registerForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password*</label>
+          <input 
+            type="password" 
+            id="password" 
+            formControlName="password" 
+            placeholder="Choose a password"
+            class="form-control">
+          <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="error-message">
+            <span *ngIf="registerForm.get('password')?.errors?.['required']">Password is required</span>
+            <span *ngIf="registerForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</span>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password*</label>
+          <input 
+            type="password" 
+            id="confirmPassword" 
+            formControlName="confirmPassword" 
+            placeholder="Confirm your password"
+            class="form-control">
+          <div *ngIf="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched" class="error-message">
+            <span *ngIf="registerForm.get('confirmPassword')?.errors?.['required']">Please confirm your password</span>
+            <span *ngIf="registerForm.get('confirmPassword')?.errors?.['passwordMismatch']">Passwords do not match</span>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="role">Role*</label>
+          <select 
+            id="role" 
+            formControlName="role" 
+            class="form-control">
+            <option *ngFor="let role of userRoles" [value]="role.value">{{ role.label }}</option>
+          </select>
+        </div>
+        
+        <div *ngIf="errorMessage" class="alert alert-danger">
+          {{ errorMessage }}
+        </div>
+        
+        <button 
+          type="submit" 
+          [disabled]="registerForm.invalid || isSubmitting" 
+          class="btn btn-primary">
+          {{ isSubmitting ? 'Registering...' : 'Register' }}
+        </button>
+        
+        <div class="login-link">
+          Already have an account? <a routerLink="/login">Login here</a>
+        </div>
+      </form>
+    </div>
+  </div>
