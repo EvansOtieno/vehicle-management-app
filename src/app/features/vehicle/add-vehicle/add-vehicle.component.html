@@ -1,0 +1,73 @@
+<div class="add-vehicle-container">
+    <div class="form-header">
+      <h2>Register New Vehicle</h2>
+    </div>
+    
+    <form [formGroup]="vehicleForm" (ngSubmit)="onSubmit()" class="vehicle-form">
+      <div class="alert error" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="make">Make*</label>
+          <input type="text" id="make" formControlName="make" placeholder="e.g., Toyota, Honda">
+          <div class="error-message" *ngIf="vehicleForm.get('make')?.invalid && vehicleForm.get('make')?.touched">
+            Make is required
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="model">Model*</label>
+          <input type="text" id="model" formControlName="model" placeholder="e.g., Corolla, Civic">
+          <div class="error-message" *ngIf="vehicleForm.get('model')?.invalid && vehicleForm.get('model')?.touched">
+            Model is required
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="year">Year*</label>
+          <input type="number" id="year" formControlName="year" placeholder="e.g., 2025">
+          <div class="error-message" *ngIf="vehicleForm.get('year')?.invalid && vehicleForm.get('year')?.touched">
+            Enter a valid year (1900-{{ currentYear + 1 }})
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="color">Color*</label>
+          <input type="text" id="color" formControlName="color" placeholder="e.g., Red, Blue">
+          <div class="error-message" *ngIf="vehicleForm.get('color')?.invalid && vehicleForm.get('color')?.touched">
+            Color is required
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="vin">VIN Number*</label>
+          <input type="text" id="vin" formControlName="vin" placeholder="17-character VIN">
+          <div class="error-message" *ngIf="vehicleForm.get('vin')?.invalid && vehicleForm.get('vin')?.touched">
+            Valid 17-character VIN is required
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="licensePlate">License Plate*</label>
+          <input type="text" id="licensePlate" formControlName="licensePlate" placeholder="e.g., ABC123">
+          <div class="error-message" *ngIf="vehicleForm.get('licensePlate')?.invalid && vehicleForm.get('licensePlate')?.touched">
+            License plate is required
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button type="button" class="btn cancel-btn" (click)="cancel()">Cancel</button>
+        <button type="submit" class="btn submit-btn" [disabled]="isSubmitting">
+          <span *ngIf="isSubmitting">Registering...</span>
+          <span *ngIf="!isSubmitting">Register Vehicle</span>
+        </button>
+      </div>
+    </form>
+  </div>

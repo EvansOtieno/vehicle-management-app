@@ -41,26 +41,17 @@ export class LoginComponent {
     this.authService.login(loginRequest).subscribe({
       next: (response) => {
         console.log('Login Success - Microservice Response:', {
-          status: 'Success',
-          timestamp: new Date().toISOString(),
-          responseData: response,
-          token: response?.token ? '***REDACTED***' : null, // Redact sensitive token
-          userDetails: {
-            username: response?.username,
-            role: response?.roles[0]
-          }
+          responseData: response
         });
         
         this.router.navigate(['/dashboard']);
       },
       error: (error) => {
         console.error('Login Error - Microservice Response:', {
-          status: 'Error',
-          timestamp: new Date().toISOString(),
           errorDetails: {
             statusCode: error.status,
             message: error.message,
-            fullError: error.error, // Be cautious with logging full error in production
+            fullError: error.error, 
             url: error.url
           },
           requestPayload: loginRequest // Log what was sent to the microservice

@@ -46,7 +46,7 @@ export class AuthService {
           const user: User = {
             username: response.username,
             email: response.email,
-            id: response.userId, 
+            id: response.id,
             roles: response.roles, // Assuming the first role is the primary one
           };
           

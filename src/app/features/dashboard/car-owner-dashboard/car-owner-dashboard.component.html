@@ -1,53 +1,69 @@
 <div class="car-owner-dashboard">
-    <h2>Car Owner Dashboard</h2>
-    
-    <div class="dashboard-section">
-      <div class="section-header">
-        <h3>My Vehicles</h3>
-        <button class="add-btn">Add New Vehicle</button>
-      </div>
-      
-      <div class="vehicles-list">
-        <div *ngFor="let car of cars" class="vehicle-card">
-          <h4>{{ car.make }} {{ car.model }} ({{ car.year }})</h4>
-          <div class="vehicle-status" [ngClass]="{'status-active': car.status === 'Active', 'status-service': car.status === 'In Service'}">
-            {{ car.status }}
-          </div>
-          <div class="vehicle-actions">
-            <button class="action-btn">Service History</button>
-            <button class="action-btn">Schedule Service</button>
-          </div>
-        </div>
-        
-        <div *ngIf="cars.length === 0" class="empty-state">
-          No vehicles added yet. Add your first vehicle to get started.
-        </div>
-      </div>
+  <h2>Car Owner Dashboard</h2>
+  
+  <div class="dashboard-section">
+    <div class="section-header">
+      <h3>My Vehicles</h3>
+      <button class="add-btn" routerLink="/vehicles/add">Add New Vehicle</button>
     </div>
     
-    <div class="dashboard-section">
-      <div class="section-header">
-        <h3>Upcoming Appointments</h3>
+    <div *ngIf="isLoading" class="loading-state">
+      Loading your vehicles...
+    </div>
+    
+    <div *ngIf="error" class="error-state">
+      {{ error }}
+    </div>
+    
+    <div *ngIf="!isLoading && !error" class="vehicles-list">
+      <div *ngFor="let car of cars" class="vehicle-card">
+        <h4>{{ car.make }} {{ car.model }} ({{ car.year }})</h4>
+        <div class="vehicle-details">
+          <div class="detail-item">
+            <span class="label">Color:</span> {{ car.color }}
+          </div>
+          <div class="detail-item">
+            <span class="label">License:</span> {{ car.licensePlate }}
+          </div>
+          <div class="detail-item">
+            <span class="label">VIN:</span> {{ car.vin }}
+          </div>
+        </div>
+        <div class="vehicle-actions">
+          <button class="action-btn">Service History</button>
+          <button class="action-btn">Schedule Service</button>
+        </div>
       </div>
       
-      <div class="appointments-list">
-        <div *ngFor="let appointment of appointments" class="appointment-card">
-          <div class="appointment-date">
-            <strong>{{ appointment.date | date: 'MMM d, y' }}</strong> at {{ appointment.time }}
-          </div>
-          <div class="appointment-details">
-            <div>Mechanic: {{ appointment.mechanic }}</div>
-            <div class="appointment-status">{{ appointment.status }}</div>
-          </div>
-          <div class="appointment-actions">
-            <button class="action-btn">Reschedule</button>
-            <button class="action-btn danger">Cancel</button>
-          </div>
-        </div>
-        
-        <div *ngIf="appointments.length === 0" class="empty-state">
-          No upcoming appointments. Schedule a service for your vehicle.
-        </div>
+      <div *ngIf="cars.length === 0 && !isLoading" class="empty-state">
+        No vehicles added yet. Add your first vehicle to get started.
       </div>
     </div>
   </div>
+  
+  <div class="dashboard-section">
+    <div class="section-header">
+      <h3>Upcoming Appointments</h3>
+    </div>
+    
+    <div class="appointments-list">
+      <div *ngFor="let appointment of appointments" class="appointment-card">
+        <div class="appointment-date">
+          <strong>{{ appointment.date | date: 'MMM d, y' }}</strong> at {{ appointment.time }}
+        </div>
+        <div class="appointment-details">
+          <div>Mechanic: {{ appointment.mechanic }}</div>
+          <div class="appointment-status">{{ appointment.status }}</div>
+        </div>
+        <div class="appointment-actions">
+          <button class="action-btn">Reschedule</button>
+          <button class="action-btn danger">Cancel</button>
+        </div>
+      </div>
+      
+      <div *ngIf="appointments.length === 0" class="empty-state">
+        No upcoming appointments. Schedule a service for your vehicle.
+      </div>
+    </div>
+  </div>
+</div>

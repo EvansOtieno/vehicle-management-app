@@ -19,5 +19,5 @@ export interface LoginRequest {
     username: string;
     email: string;
     roles: string[];
-    userId: number;
+    id: number;
   }

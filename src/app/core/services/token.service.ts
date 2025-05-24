@@ -1,3 +1,4 @@
+// core/services/token.service.ts
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { jwtDecode } from 'jwt-decode';
@@ -10,6 +11,8 @@ interface JwtPayload {
   role: string;
   exp: number;
   iat: number;
+  userId?: string; // Add userId if your JWT includes it
+  email?: string;  // Add email if your JWT includes it
   // Add any other claims you expect in your JWT
 }
 
@@ -75,21 +78,55 @@ export class TokenService {
     }
   }
 
-  getUserRole(): String {
+  getUserRole(): string | null {
     const user = this.userSubject.value;
-    if (user) {
+    if (user && user.roles && user.roles.length > 0) {
       return user.roles[0];
     }
     const role = this.getRoleFromToken();
     return role ? role : 'guest'; // Default to 'guest' if no role found
   }
 
-  private getRoleFromToken(): String | null {
+  // Check if user has specific role
+  hasRole(role: string): boolean {
+    const userRole = this.getUserRole();
+    return userRole === role;
+  }
+
+  // Check if user has any of the specified roles
+  hasAnyRole(roles: string[]): boolean {
+    const userRole = this.getUserRole();
+    return userRole ? roles.includes(userRole) : false;
+  }
+
+  // Get user ID from current user or token
+  getCurrentUserId(): string | null {
+    const user = this.getCurrentUser();
+    if (user && user.id) {
+      return user.id.toString();
+    }
+    
+    // Fallback to getting from token
     const token = this.getToken();
     if (token) {
       try {
         const decoded = jwtDecode<JwtPayload>(token);
-        return decoded.role as String;
+        return decoded.userId || decoded.sub;
+      } catch (error) {
+        console.error('Error getting user ID from token:', error);
+        return null;
+      }
+    }
+    
+    return null;
+  }
+
+  private getRoleFromToken(): string | null {
+    const token = this.getToken();
+    if (token) {
+      try {
+        const decoded = jwtDecode<JwtPayload>(token);
+        return decoded.role;
       } catch (error) {
         console.error('Error decoding token:', error);
         return null;
@@ -107,12 +144,20 @@ export class TokenService {
 
     try {
       const decoded = jwtDecode<JwtPayload>(token);
+      
+      // Get existing user data to preserve additional fields
+      const existingUser = this.getUser();
+      
       const user: User = {
+        id: decoded.userId ? parseInt(decoded.userId) : undefined,
         username: decoded.sub,
+        email: decoded.email || existingUser?.email || '',
+        firstName: existingUser?.firstName,
+        lastName: existingUser?.lastName,
         roles: [decoded.role],
-        email: this.getUser()?.email || '', 
-        ...(this.getUser() || {})
+        ...existingUser // Preserve any additional user data
       };
+      
       this.saveUser(user);
     } catch (error) {
       console.error('Error updating user from token:', error);
@@ -140,12 +185,37 @@ export class TokenService {
     return !!this.getToken() && !this.isTokenExpired();
   }
 
+  // Check if user is authenticated
+  isAuthenticated(): boolean {
+    return this.isValidToken() && !!this.getCurrentUser();
+  }
+
+  // Check if user is a mechanic
+  isMechanic(): boolean {
+    return this.hasRole('MECHANIC');
+  }
+
+  // Check if user is an admin
+  isAdmin(): boolean {
+    return this.hasRole('ADMIN');
+  }
+
+  // Check if user is a car owner
+  isCarOwner(): boolean {
+    return this.hasRole('CAR_OWNER');
+  }
+
+  // Check if user is a part dealer
+  isPartDealer(): boolean {
+    return this.hasRole('PART_DEALER');
+  }
+
   clearStorage(): void {
     this.removeToken();
     this.removeUser();
   }
 
-  // Optional: Token refresh functionality
+  // Get token expiration date
   getTokenExpirationDate(): Date | null {
     const token = this.getToken();
     if (!token) return null;
@@ -156,6 +226,31 @@ export class TokenService {
     } catch (error) {
       console.error('Error decoding token:', error);
       return null;
+    }
+  }
+
+  // Get time until token expires (in minutes)
+  getTimeUntilExpiration(): number | null {
+    const expirationDate = this.getTokenExpirationDate();
+    if (!expirationDate) return null;
+
+    const now = new Date();
+    const timeUntilExpiration = expirationDate.getTime() - now.getTime();
+    return Math.floor(timeUntilExpiration / (1000 * 60)); // Convert to minutes
+  }
+
+  // Check if token expires soon (within specified minutes)
+  isTokenExpiringSoon(withinMinutes: number = 5): boolean {
+    const timeUntilExpiration = this.getTimeUntilExpiration();
+    return timeUntilExpiration !== null && timeUntilExpiration <= withinMinutes;
+  }
+
+  // Update user profile data (call this after profile updates)
+  updateUserProfile(profileData: Partial<User>): void {
+    const currentUser = this.getCurrentUser();
+    if (currentUser) {
+      const updatedUser = { ...currentUser, ...profileData };
+      this.saveUser(updatedUser);
     }
   }
 }

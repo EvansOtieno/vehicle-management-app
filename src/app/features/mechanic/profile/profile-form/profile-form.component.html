@@ -1,0 +1,566 @@
+<!-- features/mechanic/profile/profile-form/profile-form.component.html -->
+<div class="profile-form-container">
+  <div class="form-header">
+    <h2>{{ isEditMode ? 'Update' : 'Complete' }} Your Mechanic Profile</h2>
+    <p>Provide detailed information about your services to attract more customers.</p>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>{{ isEditMode ? 'Loading profile...' : 'Saving profile...' }}</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="alert alert-error">
+    <div class="alert-content">
+      <strong>Error:</strong> {{ error }}
+      <button type="button" class="alert-close" (click)="clearMessages()">&times;</button>
+    </div>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    <div class="alert-content">
+      <strong>Success:</strong> {{ successMessage }}
+      <button type="button" class="alert-close" (click)="clearMessages()">&times;</button>
+    </div>
+  </div>
+
+  <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+    
+    <!-- Basic Information -->
+    <div class="form-section">
+      <h3>Basic Information</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="businessName">Business Name *</label>
+          <input 
+            type="text" 
+            id="businessName" 
+            formControlName="businessName"
+            placeholder="Enter your business name"
+            [class.error]="isFieldInvalid('businessName')">
+          <div class="error-message" *ngIf="isFieldInvalid('businessName')">
+            {{ getFieldError('businessName') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="businessType">Business Type *</label>
+          <select id="businessType" formControlName="businessType" [class.error]="isFieldInvalid('businessType')">
+            <option *ngFor="let type of businessTypes" [value]="type">
+              {{ type.replace('_', ' ') | titlecase }}
+            </option>
+          </select>
+          <div class="error-message" *ngIf="isFieldInvalid('businessType')">
+            {{ getFieldError('businessType') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Business Description *</label>
+        <textarea 
+          id="description" 
+          formControlName="description"
+          placeholder="Describe your services, experience, and what makes your business unique..."
+          rows="4"
+          [class.error]="isFieldInvalid('description')">
+        </textarea>
+        <div class="error-message" *ngIf="isFieldInvalid('description')">
+          {{ getFieldError('description') }}
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="yearsOfExperience">Years of Experience *</label>
+          <input 
+            type="number" 
+            id="yearsOfExperience" 
+            formControlName="yearsOfExperience"
+            min="0"
+            placeholder="0"
+            [class.error]="isFieldInvalid('yearsOfExperience')">
+          <div class="error-message" *ngIf="isFieldInvalid('yearsOfExperience')">
+            {{ getFieldError('yearsOfExperience') }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact Information -->
+    <div class="form-section">
+      <h3>Contact Information</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="contactPhone">Phone Number *</label>
+          <input 
+            type="tel" 
+            id="contactPhone" 
+            formControlName="contactPhone"
+            placeholder="+254 700 000 000"
+            [class.error]="isFieldInvalid('contactPhone')">
+          <div class="error-message" *ngIf="isFieldInvalid('contactPhone')">
+            {{ getFieldError('contactPhone') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="contactEmail">Email Address *</label>
+          <input 
+            type="email" 
+            id="contactEmail" 
+            formControlName="contactEmail"
+            placeholder="your@email.com"
+            [class.error]="isFieldInvalid('contactEmail')">
+          <div class="error-message" *ngIf="isFieldInvalid('contactEmail')">
+            {{ getFieldError('contactEmail') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="website">Website (Optional)</label>
+        <input 
+          type="url" 
+          id="website" 
+          formControlName="website"
+          placeholder="https://yourbusiness.com"
+          [class.error]="isFieldInvalid('website')">
+        <div class="error-message" *ngIf="isFieldInvalid('website')">
+          {{ getFieldError('website') }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Location -->
+    <div class="form-section">
+      <h3>Business Location</h3>
+      
+      <div class="location-section" formGroupName="location">
+        <div class="form-group">
+          <label for="address">Address *</label>
+          <input 
+            type="text" 
+            id="address" 
+            formControlName="address"
+            placeholder="Enter your business address"
+            (input)="onAddressChange($event)"
+            [class.error]="profileForm.get('location.address')?.invalid && profileForm.get('location.address')?.touched">
+          <div class="error-message" *ngIf="profileForm.get('location.address')?.invalid && profileForm.get('location.address')?.touched">
+            Address is required
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="city">City *</label>
+            <input 
+              type="text" 
+              id="city" 
+              formControlName="city"
+              placeholder="City"
+              [class.error]="profileForm.get('location.city')?.invalid && profileForm.get('location.city')?.touched">
+            <div class="error-message" *ngIf="profileForm.get('location.city')?.invalid && profileForm.get('location.city')?.touched">
+              City is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="state">State/County *</label>
+            <input 
+              type="text" 
+              id="state" 
+              formControlName="state"
+              placeholder="State/County"
+              [class.error]="profileForm.get('location.state')?.invalid && profileForm.get('location.state')?.touched">
+            <div class="error-message" *ngIf="profileForm.get('location.state')?.invalid && profileForm.get('location.state')?.touched">
+              State/County is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="zipCode">Postal Code *</label>
+            <input 
+              type="text" 
+              id="zipCode" 
+              formControlName="zipCode"
+              placeholder="00000"
+              [class.error]="profileForm.get('location.zipCode')?.invalid && profileForm.get('location.zipCode')?.touched">
+            <div class="error-message" *ngIf="profileForm.get('location.zipCode')?.invalid && profileForm.get('location.zipCode')?.touched">
+              Postal code is required
+            </div>
+          </div>
+        </div>
+
+        <div class="map-container">
+          <div class="map-header">
+            <h4>Select Your Location on Map</h4>
+            <button type="button" class="btn-secondary" (click)="getCurrentLocation()">
+              Use Current Location
+            </button>
+          </div>
+          <div #mapContainer class="map" style="height: 400px; width: 100%;"></div>
+          <div *ngIf="!isGoogleMapsLoaded" class="map-loading">
+            Loading map... Please ensure Google Maps API is loaded.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Specializations -->
+    <div class="form-section">
+      <h3>Specializations</h3>
+      <p>Add your areas of expertise to help customers find you</p>
+      
+      <div class="specializations-container" formArrayName="specializations">
+        <div *ngFor="let specialization of specializations.controls; let i = index" class="specialization-item">
+          <input 
+            type="text" 
+            [formControlName]="i"
+            placeholder="e.g., BMW Specialist, Diesel Engines, etc."
+            [class.error]="specialization.invalid && specialization.touched">
+          <button type="button" class="btn-remove" (click)="removeSpecialization(i)">
+            Remove
+          </button>
+          <div class="error-message" *ngIf="specialization.invalid && specialization.touched">
+            Specialization is required
+          </div>
+        </div>
+        
+        <button type="button" class="btn-add" (click)="addSpecialization()">
+          Add Specialization
+        </button>
+      </div>
+    </div>
+
+    <!-- Services Offered -->
+    <div class="form-section">
+      <h3>Services Offered</h3>
+      <p>List the services you provide with pricing and duration estimates</p>
+      
+      <div class="services-container" formArrayName="servicesOffered">
+        <div *ngFor="let service of servicesOffered.controls; let i = index" class="service-item" [formGroupName]="i">
+          <div class="service-header">
+            <h4>Service {{ i + 1 }}</h4>
+            <button type="button" class="btn-remove" (click)="removeService(i)">
+              Remove Service
+            </button>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Service Name *</label>
+              <input 
+                type="text" 
+                formControlName="name"
+                placeholder="e.g., Oil Change, Brake Repair"
+                [class.error]="service.get('name')?.invalid && service.get('name')?.touched">
+              <div class="error-message" *ngIf="service.get('name')?.invalid && service.get('name')?.touched">
+                Service name is required
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Category *</label>
+              <select formControlName="category" [class.error]="service.get('category')?.invalid && service.get('category')?.touched">
+                <option *ngFor="let category of serviceCategories" [value]="category">
+                  {{ category.replace('_', ' ') | titlecase }}
+                </option>
+              </select>
+              <div class="error-message" *ngIf="service.get('category')?.invalid && service.get('category')?.touched">
+                Category is required
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Description *</label>
+            <textarea 
+              formControlName="description"
+              placeholder="Describe what this service includes..."
+              rows="2"
+              [class.error]="service.get('description')?.invalid && service.get('description')?.touched">
+            </textarea>
+            <div class="error-message" *ngIf="service.get('description')?.invalid && service.get('description')?.touched">
+              Service description is required
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Base Price (KSH) *</label>
+              <input 
+                type="number" 
+                formControlName="basePrice"
+                min="0"
+                placeholder="0"
+                [class.error]="service.get('basePrice')?.invalid && service.get('basePrice')?.touched">
+              <div class="error-message" *ngIf="service.get('basePrice')?.invalid && service.get('basePrice')?.touched">
+                Valid price is required
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Estimated Duration (minutes) *</label>
+              <input 
+                type="number" 
+                formControlName="estimatedDuration"
+                min="15"
+                placeholder="60"
+                [class.error]="service.get('estimatedDuration')?.invalid && service.get('estimatedDuration')?.touched">
+              <div class="error-message" *ngIf="service.get('estimatedDuration')?.invalid && service.get('estimatedDuration')?.touched">
+                Duration must be at least 15 minutes
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="btn-add" (click)="addService()">
+          Add Service
+        </button>
+      </div>
+    </div>
+
+    <!-- Working Hours -->
+    <div class="form-section">
+      <h3>Working Hours</h3>
+      <p>Set your business hours for each day of the week</p>
+      
+      <div class="working-hours-container" formArrayName="workingHours">
+        <div *ngFor="let hours of workingHours.controls; let i = index" class="hours-item" [formGroupName]="i">
+          <div class="day-row">
+            <div class="day-name">
+              <label>{{ hours.get('day')?.value }}</label>
+              <input type="checkbox" formControlName="isOpen" class="day-toggle">
+              <span>Open</span>
+            </div>
+
+            <div class="time-inputs" *ngIf="hours.get('isOpen')?.value">
+              <div class="time-group">
+                <label>Open Time</label>
+                <input type="time" formControlName="openTime" [class.error]="hours.get('openTime')?.invalid && hours.get('openTime')?.touched">
+              </div>
+              <div class="time-group">
+                <label>Close Time</label>
+                <input type="time" formControlName="closeTime" [class.error]="hours.get('closeTime')?.invalid && hours.get('closeTime')?.touched">
+              </div>
+            </div>
+
+            <div class="closed-indicator" *ngIf="!hours.get('isOpen')?.value">
+              <span>Closed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Certifications -->
+    <div class="form-section">
+      <h3>Certifications & Licenses</h3>
+      <p>Add your professional certifications to build trust with customers</p>
+      
+      <div class="certifications-container" formArrayName="certifications">
+        <div *ngFor="let cert of certifications.controls; let i = index" class="certification-item" [formGroupName]="i">
+          <div class="cert-header">
+            <h4>Certification {{ i + 1 }}</h4>
+            <button type="button" class="btn-remove" (click)="removeCertification(i)">
+              Remove
+            </button>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Certification Name *</label>
+              <input 
+                type="text" 
+                formControlName="name"
+                placeholder="e.g., ASE Master Technician"
+                [class.error]="cert.get('name')?.invalid && cert.get('name')?.touched">
+              <div class="error-message" *ngIf="cert.get('name')?.invalid && cert.get('name')?.touched">
+                Certification name is required
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Issuing Organization *</label>
+              <input 
+                type="text" 
+                formControlName="issuingOrganization"
+                placeholder="e.g., National Institute for Automotive Service Excellence"
+                [class.error]="cert.get('issuingOrganization')?.invalid && cert.get('issuingOrganization')?.touched">
+              <div class="error-message" *ngIf="cert.get('issuingOrganization')?.invalid && cert.get('issuingOrganization')?.touched">
+                Issuing organization is required
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Issue Date *</label>
+              <input 
+                type="date" 
+                formControlName="issueDate"
+                [class.error]="cert.get('issueDate')?.invalid && cert.get('issueDate')?.touched">
+              <div class="error-message" *ngIf="cert.get('issueDate')?.invalid && cert.get('issueDate')?.touched">
+                Issue date is required
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Expiration Date</label>
+              <input type="date" formControlName="expiryDate">
+            </div>
+
+            <div class="form-group">
+              <label>Certificate Number *</label>
+              <input 
+                type="text" 
+                formControlName="certificateNumber"
+                placeholder="Certificate/License Number"
+                [class.error]="cert.get('certificateNumber')?.invalid && cert.get('certificateNumber')?.touched">
+              <div class="error-message" *ngIf="cert.get('certificateNumber')?.invalid && cert.get('certificateNumber')?.touched">
+                Certificate number is required
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="btn-add" (click)="addCertification()">
+          Add Certification
+        </button>
+      </div>
+    </div>
+
+    <!-- Business Details -->
+    <div class="form-section">
+      <h3>Additional Business Details</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="licenseNumber">Business License Number</label>
+          <input 
+            type="text" 
+            id="licenseNumber" 
+            formControlName="licenseNumber"
+            placeholder="Your business license number">
+        </div>
+
+        <div class="form-group">
+          <label for="insuranceProvider">Insurance Provider</label>
+          <input 
+            type="text" 
+            id="insuranceProvider" 
+            formControlName="insuranceProvider"
+            placeholder="Your insurance company">
+        </div>
+      </div>
+
+      <div class="checkbox-group">
+        <div class="checkbox-item">
+          <input type="checkbox" id="emergencyService" formControlName="emergencyService">
+          <label for="emergencyService">I provide emergency/24-hour services</label>
+        </div>
+
+        <div class="checkbox-item">
+          <input type="checkbox" id="mobileMechanic" formControlName="mobileMechanic">
+          <label for="mobileMechanic">I offer mobile mechanic services (come to customer)</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" (click)="onCancel()">
+        Cancel
+      </button>
+      <button type="submit" class="btn-primary" [disabled]="profileForm.invalid || isLoading">
+        <span *ngIf="isLoading">{{ isEditMode ? 'Updating...' : 'Creating...' }}</span>
+        <span *ngIf="!isLoading">{{ isEditMode ? 'Update Profile' : 'Create Profile' }}</span>
+      </button>
+    </div>
+  </form>
+</div>
+
+<style>
+/* Alert Styles */
+.alert {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0.375rem;
+  position: relative;
+}
+
+.alert-error {
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.alert-success {
+  background-color: #dcfce7;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+}
+
+.alert-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.alert-close {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.7;
+}
+
+.alert-close:hover {
+  opacity: 1;
+}
+
+/* Loading Spinner */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Form error states */
+.form-group input.error,
+.form-group select.error,
+.form-group textarea.error {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.error-message {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+</style>

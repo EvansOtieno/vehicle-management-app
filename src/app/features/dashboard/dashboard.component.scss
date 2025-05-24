@@ -1,109 +1,404 @@
+// features/dashboard/dashboard.component.scss
 .dashboard-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #f8fafc;
+}
+
+.dashboard-header {
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+
+  .brand h1 {
+    color: #1f2937;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .user-controls {
     display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    
-    .dashboard-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 2rem;
-      background-color: #343a40;
+    align-items: center;
+    gap: 1rem;
+
+    .welcome-message {
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    .logout-btn {
+      background: #ef4444;
       color: white;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      
-      .brand {
-        h1 {
-          margin: 0;
-          font-size: 1.5rem;
-        }
-      }
-      
-      .user-controls {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        
-        .welcome-message {
-          font-weight: 500;
-        }
-        
-        .logout-btn {
-          padding: 0.5rem 1rem;
-          background-color: #dc3545;
-          color: white;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          transition: background-color 0.2s;
-          
-          &:hover {
-            background-color: #c82333;
-          }
-        }
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #dc2626;
+        transform: translateY(-1px);
       }
     }
-    
-    .dashboard-content {
-      display: flex;
-      flex: 1;
-      
-      .sidebar {
-        width: 250px;
-        background-color: #f8f9fa;
-        border-right: 1px solid #dee2e6;
-        padding: 1.5rem 1rem;
-        
-        h3 {
-          margin-top: 0;
-          margin-bottom: 1rem;
-          font-size: 1.25rem;
-          color: #495057;
+  }
+}
+
+.dashboard-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 280px;
+  background: white;
+  border-right: 1px solid #e5e7eb;
+  padding: 2rem 0;
+  overflow-y: auto;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+
+  h3 {
+    color: #374151;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 1rem 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .nav-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    .nav-item {
+      margin-bottom: 0.25rem;
+
+      &.nav-divider {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e5e7eb;
+      }
+
+      a {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.875rem 1.5rem;
+        color: #6b7280;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        font-weight: 500;
+        border-radius: 0;
+        position: relative;
+
+        svg {
+          flex-shrink: 0;
+          transition: transform 0.2s ease;
         }
-        
-        .nav-items {
-          list-style: none;
-          padding: 0;
-          margin: 0;
+
+        &:hover {
+          background: #f9fafb;
+          color: #374151;
           
-          .nav-item {
-            margin-bottom: 0.5rem;
-            
-            a {
-              display: block;
-              padding: 0.75rem 1rem;
-              color: #495057;
-              text-decoration: none;
-              border-radius: 4px;
-              transition: background-color 0.2s, color 0.2s;
-              
-              &:hover {
-                background-color: #e9ecef;
-                color: #007bff;
-              }
-              
-              &.active {
-                background-color: #007bff;
-                color: white;
-              }
-            }
+          svg {
+            transform: scale(1.1);
           }
         }
-      }
-      
-      .main-content {
-        flex: 1;
-        padding: 2rem;
-        background-color: #ffffff;
-        
-        .role-error {
-          text-align: center;
-          margin-top: 2rem;
+
+        &.active {
+          background: linear-gradient(90deg, #eff6ff 0%, #dbeafe 100%);
+          color: #2563eb;
+          border-right: 3px solid #2563eb;
+          font-weight: 600;
+
+          &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 24px;
+            background: #2563eb;
+            border-radius: 0 2px 2px 0;
+          }
+        }
+
+        // Specific colors for different navigation items
+        &[routerLink="/profile"]:hover,
+        &[routerLink="/profile"].active {
+          color: #059669;
+          background: linear-gradient(90deg, #ecfdf5 0%, #d1fae5 100%);
+          border-right-color: #059669;
           
-          h2 {
-            color: #dc3545;
+          &::before {
+            background: #059669;
+          }
+        }
+
+        &[routerLink="/appointments"]:hover,
+        &[routerLink="/appointments"].active,
+        &[routerLink="/bookings"]:hover,
+        &[routerLink="/bookings"].active {
+          color: #7c3aed;
+          background: linear-gradient(90deg, #f3e8ff 0%, #e9d5ff 100%);
+          border-right-color: #7c3aed;
+          
+          &::before {
+            background: #7c3aed;
+          }
+        }
+
+        &[routerLink="/services"]:hover,
+        &[routerLink="/services"].active {
+          color: #dc2626;
+          background: linear-gradient(90deg, #fef2f2 0%, #fecaca 100%);
+          border-right-color: #dc2626;
+          
+          &::before {
+            background: #dc2626;
+          }
+        }
+
+        &[routerLink="/admin"]:hover,
+        &[routerLink="/admin"].active {
+          color: #b45309;
+          background: linear-gradient(90deg, #fffbeb 0%, #fef3c7 100%);
+          border-right-color: #b45309;
+          
+          &::before {
+            background: #b45309;
           }
         }
       }
     }
   }
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  background: #f8fafc;
+  position: relative;
+
+  // Role-specific dashboard components
+  app-admin-dashboard,
+  app-car-owner-dashboard,
+  app-mechanic-dashboard,
+  app-part-dealer-dashboard {
+    display: block;
+    height: 100%;
+    padding: 2rem;
+  }
+
+  .role-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    padding: 2rem;
+
+    h2 {
+      color: #ef4444;
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: #6b7280;
+      font-size: 1rem;
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 240px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    padding: 1rem;
+
+    .brand h1 {
+      font-size: 1.25rem;
+    }
+
+    .user-controls {
+      gap: 0.5rem;
+
+      .welcome-message {
+        display: none; // Hide on very small screens
+      }
+    }
+  }
+
+  .dashboard-content {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    padding: 1rem 0;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+    max-height: 200px;
+
+    h3 {
+      display: none;
+    }
+
+    .nav-items {
+      display: flex;
+      overflow-x: auto;
+      padding: 0 1rem;
+      gap: 0.5rem;
+
+      .nav-item {
+        margin-bottom: 0;
+        flex-shrink: 0;
+
+        &.nav-divider {
+          margin-top: 0;
+          padding-top: 0;
+          border-top: none;
+        }
+
+        a {
+          white-space: nowrap;
+          padding: 0.75rem 1rem;
+          border-radius: 8px;
+          border-right: none;
+          min-width: auto;
+
+          span {
+            display: none; // Hide text on mobile, show only icons
+          }
+
+          &.active {
+            border-right: none;
+            border-bottom: 2px solid #2563eb;
+            
+            &::before {
+              display: none;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .main-content {
+    app-admin-dashboard,
+    app-car-owner-dashboard,
+    app-mechanic-dashboard,
+    app-part-dealer-dashboard {
+      padding: 1rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+
+    .user-controls {
+      align-self: flex-end;
+    }
+  }
+
+  .sidebar .nav-items .nav-item a {
+    padding: 0.5rem 0.75rem;
+    
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+// Add this to your dashboard.component.scss for the click handlers
+.nav-link {
+  cursor: pointer;
+  user-select: none;
+}
+
+// Updated sidebar styles
+.sidebar {
+  .nav-items {
+    .nav-item {
+      a, .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.875rem 1.5rem;
+        color: #6b7280;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        font-weight: 500;
+        border-radius: 0;
+        position: relative;
+        cursor: pointer;
+        user-select: none;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+        font-size: inherit;
+        font-family: inherit;
+
+        svg {
+          flex-shrink: 0;
+          transition: transform 0.2s ease;
+        }
+
+        &:hover {
+          background: #f9fafb;
+          color: #374151;
+          
+          svg {
+            transform: scale(1.1);
+          }
+        }
+
+        &:focus {
+          outline: 2px solid #3b82f6;
+          outline-offset: -2px;
+        }
+
+        &.active {
+          background: linear-gradient(90deg, #eff6ff 0%, #dbeafe 100%);
+          color: #2563eb;
+          border-right: 3px solid #2563eb;
+          font-weight: 600;
+
+          &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 24px;
+            background: #2563eb;
+            border-radius: 0 2px 2px 0;
+          }
+        }
+      }
+    }
+  }
+}
