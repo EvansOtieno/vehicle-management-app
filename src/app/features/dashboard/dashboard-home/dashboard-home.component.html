@@ -1,0 +1,10 @@
+<ng-container [ngSwitch]="userRole">
+    <app-admin-dashboard *ngSwitchCase="'ROLE_ADMIN'"></app-admin-dashboard>
+    <app-car-owner-dashboard *ngSwitchCase="'ROLE_CAR_OWNER'"></app-car-owner-dashboard>
+    <app-mechanic-dashboard *ngSwitchCase="'ROLE_MECHANIC'"></app-mechanic-dashboard>
+    <app-part-dealer-dashboard *ngSwitchCase="'ROLE_PART_DEALER'"></app-part-dealer-dashboard>
+    <div *ngSwitchDefault class="role-error">
+    <h2>Role not recognized</h2>
+    <p>Please contact support for assistance.</p>
+    </div>
+</ng-container>

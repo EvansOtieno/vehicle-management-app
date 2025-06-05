@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil, finalize } from 'rxjs/operators';
 
@@ -26,7 +26,8 @@ export class MechanicProfileComponent implements OnInit, OnDestroy {
   constructor(
     private mechanicProfileService: MechanicProfileService,
     private tokenService: TokenService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -105,7 +106,7 @@ export class MechanicProfileComponent implements OnInit, OnDestroy {
     const userId = this.tokenService.getCurrentUserId();
     
     if (this.profile) {
-      this.router.navigate([`/mechanic/profile/edit/${userId}`]).then(
+      this.router.navigate([`edit/${userId}`], { relativeTo: this.route }).then(
       (success) => {
         console.log('Navigation success:', success);
       },

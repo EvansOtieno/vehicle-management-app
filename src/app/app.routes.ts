@@ -5,102 +5,72 @@ import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { authGuardFn } from './core/guards/auth.guard';
 import { roleGuardFn } from './core/guards/role.guard';
 import { UserRole } from './core/models/user.model';
-import { MechanicProfileComponent } from './features/mechanic/profile/mechanic-profile/mechanic-profile.component';
-import { ProfileFormComponent } from './features/mechanic/profile/profile-form/profile-form.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+  
+  // Main Dashboard with nested routes
   { 
     path: 'dashboard', 
     component: DashboardComponent,
-    canActivate: [authGuardFn]
-  },
-  { 
-    path: 'admin', 
-    loadComponent: () => import('./features/dashboard/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
-    canActivate: [() => roleGuardFn(['ADMIN' as UserRole])]
-  },
-  {
-    path: 'vehicles',
     canActivate: [authGuardFn],
     children: [
+      // Default dashboard home
+      { 
+        path: '', 
+        redirectTo: 'home', 
+        pathMatch: 'full' 
+      },
       {
-        path: 'add',
-        loadComponent: () => import('./features/vehicle/add-vehicle/add-vehicle.component').then(m => m.AddVehicleComponent)
-      }
-    ]
-  },
-  // Mechanic Profile Routes
-  {
-  path: 'mechanic',
-    canActivate: [authGuardFn, () => roleGuardFn(['ROLE_MECHANIC' as UserRole])],
-    children: [
+        path: 'home',
+        loadComponent: () => import('./features/dashboard/dashboard-home/dashboard-home.component').then(m => m.DashboardHomeComponent)
+      },
+      
+      // Profile routes
       {
         path: 'profile',
-        component: MechanicProfileComponent,
-        data: { title: 'Mechanic Profile' }
-      },
-      {
-        path: 'profile/create',
-        component: ProfileFormComponent,
-        data: { title: 'Create Profile' }
-      },
-      {
-        path: 'profile/edit/:id',
-        component: ProfileFormComponent,
-        data: { title: 'Edit Profile' }
-      },
-      {
-        path: 'dashboard',
-        component: DashboardComponent,
-        data: { title: 'Dashboard' }
-      },
-      { 
-        path: '',
-        redirectTo: '/dashboard',
-        pathMatch: 'full'
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./features/dashboard/profile/profile-router/profile-router.component').then(m => m.ProfileRouterComponent)
+          },
+          {
+            path: 'mechanic',
+            canActivate: [() => roleGuardFn(['ROLE_MECHANIC' as UserRole])],
+            loadComponent: () => import('./features/mechanic/profile/mechanic-profile/mechanic-profile.component').then(m => m.MechanicProfileComponent)
+          },
+          {
+             path: 'mechanic/edit/:id',
+            canActivate: [() => roleGuardFn(['ROLE_MECHANIC' as UserRole])],
+            loadComponent: () => import('./features/mechanic/profile/profile-form/profile-form.component').then(m => m.ProfileFormComponent)
+          }
+          // Add other profile routes here as needed
+        ]
       }
+
+      // Add other feature routes here as you implement them
     ]
   },
-  /*
-  {
-    path: 'car-owner/profile',
-    loadComponent: () => import('./features/car-owner/profile/car-owner-profile.component').then(m => m.CarOwnerProfileComponent),
-    canActivate: [authGuardFn, () => roleGuardFn(['ROLE_CAR_OWNER' as UserRole])]
+
+  // Legacy redirects
+  { 
+    path: 'admin', 
+    redirectTo: '/dashboard/admin',
+    pathMatch: 'full'
   },
-  {
-    path: 'appointments',
-    canActivate: [authGuardFn],
-    children: [
-      {
-        path: '',
-        loadComponent: () => import('./features/appointments/appointment-list/appointment-list.component').then(m => m.AppointmentListComponent)
-      },
-      {
-        path: 'new',
-        loadComponent: () => import('./features/appointments/create-appointment/create-appointment.component').then(m => m.CreateAppointmentComponent)
-      },
-      {
-        path: ':id',
-        loadComponent: () => import('./features/appointments/appointment-detail/appointment-detail.component').then(m => m.AppointmentDetailComponent)
-      }
-    ]
+  { 
+    path: 'vehicles', 
+    redirectTo: '/dashboard/vehicles',
+    pathMatch: 'full'
   },
-  {
-    path: 'services',
-    canActivate: [authGuardFn, () => roleGuardFn(['ROLE_MECHANIC' as UserRole])],
-    children: [
-      {
-        path: '',
-        loadComponent: () => import('./features/services/service-list/service-list.component').then(m => m.ServiceListComponent)
-      },
-      {
-        path: 'add',
-        loadComponent: () => import('./features/services/add-service/add-service.component').then(m => m.AddServiceComponent)
-      }
-    ]
-  },*/
+  { 
+    path: 'mechanic', 
+    redirectTo: '/dashboard',
+    pathMatch: 'full'
+  },
+
+  // Catch all
   { path: '**', redirectTo: '/dashboard' }
 ];
