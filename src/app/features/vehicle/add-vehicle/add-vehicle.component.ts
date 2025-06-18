@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { VehicleService } from '../../../core/services/vehicle.service';
+import { VehicleService } from '../../../core/services/vehicle/vehicle.service';
 import { Router } from '@angular/router';
 import { Vehicle } from '../../../core/models/vehicle.model';
-import { TokenService } from '../../../core/services/token.service';
+import { TokenService } from '../../../core/services/token/token.service';
 
 @Component({
   selector: 'app-add-vehicle',

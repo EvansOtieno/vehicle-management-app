@@ -5,8 +5,8 @@ import { Subject } from 'rxjs';
 import { takeUntil, finalize } from 'rxjs/operators';
 
 import { MechanicProfile, ServiceCategory } from '../../../../core/models/mechanic-profile.model';
-import { MechanicProfileService } from '../../services/mechanic-profile.service';
-import { TokenService } from '../../../../core/services/token.service';
+import { MechanicProfileService } from '../../../../core/services/user/mechanic/mechanic-profile.service';
+import { TokenService } from '../../../../core/services/token/token.service';
 
 @Component({
   selector: 'app-mechanic-profile',
@@ -89,7 +89,6 @@ export class MechanicProfileComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Navigate to create profile (you'll need to implement routing)
   createProfile(): void {
     this.router.navigate(['/profile/edit']).then(
       (success) => {

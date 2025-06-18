@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { VehicleService } from '../../../core/services/vehicle.service';
+import { VehicleService } from '../../../core/services/vehicle/vehicle.service';
 import { Vehicle } from '../../../core/models/vehicle.model';
-import { TokenService } from '../../../core/services/token.service';
+import { TokenService } from '../../../core/services/token/token.service';
 
 @Component({
   selector: 'app-car-owner-dashboard',

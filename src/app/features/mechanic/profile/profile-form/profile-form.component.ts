@@ -15,8 +15,8 @@ import {
   BusinessType 
 } from '../../../../core/models/mechanic-profile.model';
 import { Location } from '../../../../core/models/location.model';
-import { MechanicProfileService } from '../../services/mechanic-profile.service';
-import { TokenService } from '../../../../core/services/token.service';
+import { MechanicProfileService } from '../../../../core/services/user/mechanic/mechanic-profile.service';
+import { TokenService } from '../../../../core/services/token/token.service';
 
 // Declare global google variable
 declare global {

@@ -1,7 +1,7 @@
 // features/profile/profile-router.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { TokenService } from '../../../../core/services/token.service';
+import { TokenService } from '../../../../core/services/token/token.service';
 
 @Component({
   selector: 'app-profile-router',

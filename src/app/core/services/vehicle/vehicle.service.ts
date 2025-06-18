@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { API_ENDPOINTS  } from '../utils/constants';
-import { Vehicle } from '../models/vehicle.model';
+import { API_ENDPOINTS  } from '../../utils/constants';
+import { Vehicle } from '../../models/vehicle.model';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +13,6 @@ export class VehicleService {
   constructor(private http: HttpClient) { }
 
   registerVehicle(vehicle: Vehicle): Observable<Vehicle> {
-    // Authentication headers are likely handled by an interceptor in your app
     return this.http.post<Vehicle>(`${this.apiUrl}/register`, vehicle);
   }
 

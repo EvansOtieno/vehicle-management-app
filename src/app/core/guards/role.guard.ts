@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { Router, ActivatedRouteSnapshot } from '@angular/router';
-import { TokenService } from '../services/token.service';
+import { TokenService } from '../services/token/token.service';
 import { UserRole } from '../models/user.model';
 
 export const roleGuardFn = (allowedRoles: String[]) => {

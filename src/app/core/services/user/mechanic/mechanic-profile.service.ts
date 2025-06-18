@@ -3,10 +3,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { MechanicProfile, ServiceOffered, Certification } from '../../../core/models/mechanic-profile.model';
-import { TokenService } from '../../../core/services/token.service';
-import { environment } from '../../../../environment/environment';
-import { API_ENDPOINTS  } from '../../../core/utils/constants';
+import { MechanicProfile, ServiceOffered, Certification } from '../../../models/mechanic-profile.model';
+import { TokenService } from '../../token/token.service';
+import { environment } from '../../../../../environment/environment';
+import { API_ENDPOINTS  } from '../../../utils/constants';
 
 @Injectable({
   providedIn: 'root'

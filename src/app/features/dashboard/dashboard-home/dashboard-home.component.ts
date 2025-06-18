@@ -1,7 +1,7 @@
 // features/dashboard/dashboard-home/dashboard-home.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TokenService } from '../../../core/services/token.service';
+import { TokenService } from '../../../core/services/token/token.service';
 import { AdminDashboardComponent } from '../admin-dashboard/admin-dashboard.component';
 import { CarOwnerDashboardComponent } from '../car-owner-dashboard/car-owner-dashboard.component';
 import { MechanicDashboardComponent } from '../mechanic-dashboard/mechanic-dashboard.component';

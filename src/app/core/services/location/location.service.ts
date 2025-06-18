@@ -1,7 +1,7 @@
 // core/services/location.service.ts (Mock version)
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { Location } from '../models/location.model';
+import { Location } from '../../models/location.model';
 
 declare global {
   interface Window {

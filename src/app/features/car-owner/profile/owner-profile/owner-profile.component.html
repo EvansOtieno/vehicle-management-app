@@ -1,0 +1,251 @@
+<div class="profile-display-container">
+      <!-- Header Card -->
+      <mat-card class="header-card">
+        <mat-card-header>
+          <mat-card-title>PROFILE</mat-card-title>
+          <mat-card-subtitle>Your complete profile information</mat-card-subtitle>
+          <div class="header-actions">
+            <button  mat-raised-button color="primary" (click)="editProfile()">
+              <mat-icon>edit</mat-icon>
+              Edit Profile
+            </button>
+          </div>
+        </mat-card-header>
+      </mat-card>
+
+      <!-- Loading Spinner -->
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner></mat-spinner>
+        <p>Loading profile...</p>
+      </div>
+
+      <!-- Error Message -->
+      <mat-card *ngIf="error" class="alert-card error-card">
+        <mat-card-content>
+          <div class="alert-content">
+            <mat-icon color="warn">error</mat-icon>
+            <span>{{ error }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Profile Content -->
+      <div *ngIf="!isLoading && !error && profile" class="profile-content">
+        
+        <!-- Personal Information -->
+        <mat-card class="info-section">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>person</mat-icon>
+              Personal Information
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Full Name</label>
+                <span>{{ profile.firstName }} {{ profile.lastName }}</span>
+              </div>
+              <div class="info-item">
+                <label>Date of Birth</label>
+                <span>{{ formatDate(profile.dateOfBirth) }}</span>
+              </div>
+              <div class="info-item" *ngIf="profile.gender">
+                <label>Gender</label>
+                <span>{{ formatGender(profile.gender) }}</span>
+              </div>
+              <div class="info-item">
+                <label>Driving License</label>
+                <span>{{ profile.drivingLicenseNumber }}</span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Contact Information -->
+        <mat-card class="info-section">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>contact_phone</mat-icon>
+              Contact Information
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Primary Phone</label>
+                <span>{{ profile.primaryPhone }}</span>
+              </div>
+              <div class="info-item" *ngIf="profile.secondaryPhone">
+                <label>Secondary Phone</label>
+                <span>{{ profile.secondaryPhone }}</span>
+              </div>
+              <div class="info-item">
+                <label>Email Address</label>
+                <span>{{ profile.email }}</span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Address Information -->
+        <mat-card class="info-section">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>location_on</mat-icon>
+              Address Information
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="address-display">
+              <p>{{ profile.address.street }}</p>
+              <p>{{ profile.address.city }}, {{ profile.address.county }}</p>
+              <p>{{ profile.address.postalCode }}</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Emergency Contacts -->
+        <mat-card class="info-section" *ngIf="(profile.emergencyContacts?.length ?? 0) > 0">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>contact_emergency</mat-icon>
+              Emergency Contacts
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="emergency-contacts">
+              <div *ngFor="let contact of profile.emergencyContacts; let i = index" 
+                   class="emergency-contact-item">
+                <div class="contact-info">
+                  <h4>{{ contact.name }}</h4>
+                  <div class="contact-details">
+                    <span class="relationship">{{ formatRelationship(contact.relationship) }}</span>
+                    <span class="phone">{{ contact.phone }}</span>
+                  </div>
+                </div>
+                <mat-divider *ngIf="i < profile.emergencyContacts.length - 1"></mat-divider>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Billing Information -->
+        <mat-card class="info-section">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>payment</mat-icon>
+              Billing Information
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="info-grid">
+              <div class="info-item" *ngIf="profile.billingInfo && profile.billingInfo.preferredPaymentMethod && profile.billingInfo.preferredPaymentMethod.length > 0">
+                <label>Preferred Payment Methods</label>
+                <div class="payment-methods">
+                  <mat-chip-set>
+                    <mat-chip *ngFor="let method of profile.billingInfo.preferredPaymentMethod">
+                      {{ formatPaymentMethod(method) }}
+                    </mat-chip>
+                  </mat-chip-set>
+                </div>
+              </div>
+              <div class="info-item" *ngIf="profile.billingInfo?.mpesaNumber">
+                <label>M-Pesa Number</label>
+                <span>{{ profile.billingInfo.mpesaNumber }}</span>
+              </div>
+              <div class="info-item" *ngIf="profile.billingInfo?.bankName">
+                <label>Bank Name</label>
+                <span>{{ profile.billingInfo.bankName }}</span>
+              </div>
+            </div>
+            
+            <div class="billing-preferences" *ngIf="profile.billingInfo?.requestInvoices || profile.billingInfo?.allowAutoPayment">
+              <h4>Billing Preferences</h4>
+              <div class="preference-list">
+                <div *ngIf="profile.billingInfo.requestInvoices" class="preference-item">
+                  <mat-icon color="primary">check_circle</mat-icon>
+                  <span>Request detailed invoices for all services</span>
+                </div>
+                <div *ngIf="profile.billingInfo.allowAutoPayment" class="preference-item">
+                  <mat-icon color="primary">check_circle</mat-icon>
+                  <span>Allow automatic payment for recurring services</span>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Service Preferences -->
+        <mat-card class="info-section">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>settings</mat-icon>
+              Service Preferences
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="info-grid">
+              <div class="info-item" *ngIf="profile.preferredContactTime">
+                <label>Preferred Contact Time</label>
+                <span>{{ formatContactTime(profile.preferredContactTime) }}</span>
+              </div>
+            </div>
+
+            <div class="service-preferences">
+              <h4>Communication Preferences</h4>
+              <div class="preference-list">
+                <div class="preference-item">
+                  <mat-icon [color]="profile.receiveMaintenanceReminders ? 'primary' : 'disabled'">
+                    {{ profile.receiveMaintenanceReminders ? 'check_circle' : 'cancel' }}
+                  </mat-icon>
+                  <span>Receive maintenance reminders</span>
+                </div>
+                <div class="preference-item">
+                  <mat-icon [color]="profile.receivePromotions ? 'primary' : 'disabled'">
+                    {{ profile.receivePromotions ? 'check_circle' : 'cancel' }}
+                  </mat-icon>
+                  <span>Receive promotional offers and discounts</span>
+                </div>
+                <div class="preference-item">
+                  <mat-icon [color]="profile.allowRatingRequests ? 'primary' : 'disabled'">
+                    {{ profile.allowRatingRequests ? 'check_circle' : 'cancel' }}
+                  </mat-icon>
+                  <span>Allow mechanics to request service ratings</span>
+                </div>
+                <div class="preference-item">
+                  <mat-icon [color]="profile.shareLocationForEmergency ? 'primary' : 'disabled'">
+                    {{ profile.shareLocationForEmergency ? 'check_circle' : 'cancel' }}
+                  </mat-icon>
+                  <span>Share location during emergency breakdowns</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="special-notes" *ngIf="profile.specialNotes">
+              <h4>Special Requirements or Notes</h4>
+              <p>{{ profile.specialNotes }}</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- No Profile Found -->
+      <div *ngIf="!isLoading && !error && !profile" class="no-profile-container">
+        <mat-card class="no-profile-card">
+          <mat-card-content>
+            <div class="no-profile-content">
+              <mat-icon class="no-profile-icon">person_off</mat-icon>
+              <h2>No Profile Found</h2>
+              <p>You haven't created your car owner profile yet. Create one now to start booking mechanic services and managing your vehicles.</p>
+              <div class="no-profile-actions">
+                <button mat-raised-button color="primary" (click)="createProfile()">
+                  <mat-icon>add</mat-icon>
+                  Create Profile
+                </button>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>

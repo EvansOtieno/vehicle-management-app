@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap, throwError } from 'rxjs';
-import { API_ENDPOINTS } from '../utils/constants';
-import { AuthResponse, LoginRequest, RegisterRequest } from '../models/auth.model';
-import { TokenService } from './token.service';
-import { User, UserRole } from '../models/user.model';
+import { API_ENDPOINTS } from '../../utils/constants';
+import { AuthResponse, LoginRequest, RegisterRequest } from '../../models/auth.model';
+import { TokenService } from '../token/token.service';
+import { User, UserRole } from '../../models/user.model';
 
 @Injectable({
   providedIn: 'root'

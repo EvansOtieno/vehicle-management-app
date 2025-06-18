@@ -37,6 +37,16 @@ export const routes: Routes = [
             loadComponent: () => import('./features/dashboard/profile/profile-router/profile-router.component').then(m => m.ProfileRouterComponent)
           },
           {
+            path: 'car-owner',
+            canActivate: [() => roleGuardFn(['ROLE_CAR_OWNER' as UserRole])],
+            loadComponent: () => import('./features/car-owner/profile/owner-profile/owner-profile.component').then(m => m.OwnerProfileComponent)
+          },
+          {
+            path: 'car-owner/edit/:id', 
+            canActivate: [() => roleGuardFn(['ROLE_CAR_OWNER' as UserRole])],
+            loadComponent: () => import('./features/car-owner/profile/profile-form/profile-form.component').then(m => m.ProfileFormComponent)
+          },
+          {
             path: 'mechanic',
             canActivate: [() => roleGuardFn(['ROLE_MECHANIC' as UserRole])],
             loadComponent: () => import('./features/mechanic/profile/mechanic-profile/mechanic-profile.component').then(m => m.MechanicProfileComponent)
@@ -46,11 +56,12 @@ export const routes: Routes = [
             canActivate: [() => roleGuardFn(['ROLE_MECHANIC' as UserRole])],
             loadComponent: () => import('./features/mechanic/profile/profile-form/profile-form.component').then(m => m.ProfileFormComponent)
           }
-          // Add other profile routes here as needed
+          
         ]
       }
 
-      // Add other feature routes here as you implement them
+      // Vehicle routes
+      
     ]
   },
 

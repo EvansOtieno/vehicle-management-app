@@ -2,8 +2,8 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { jwtDecode } from 'jwt-decode';
-import { TOKEN_KEY, USER_KEY } from '../utils/constants';
-import { User } from '../models/user.model';
+import { TOKEN_KEY, USER_KEY } from '../../utils/constants';
+import { User } from '../../models/user.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 interface JwtPayload {
