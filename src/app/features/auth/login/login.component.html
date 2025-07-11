@@ -4,15 +4,15 @@
       
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         <div class="form-group">
-          <label for="identifier">identifier</label>
+          <label for="identifier">Email/Phone</label>
           <input 
             type="text" 
             id="identifier" 
             formControlName="identifier" 
-            placeholder="Enter your identifier"
+            placeholder="Enter your username"
             class="form-control">
           <div *ngIf="loginForm.get('identifier')?.invalid && loginForm.get('identifier')?.touched" class="error-message">
-            identifier is required
+            email/phone is required
           </div>
         </div>
         

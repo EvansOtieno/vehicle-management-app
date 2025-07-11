@@ -1,0 +1,22 @@
+<div class="map-wrapper" [style.height]="height" [style.width]="width">
+      <div #mapContainer class="map-container"></div>
+      
+      <!-- Loading overlay -->
+      <div *ngIf="loading" class="loading-overlay">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Loading map...</p>
+      </div>
+      
+      <!-- Map controls -->
+      <div class="map-controls" *ngIf="showCurrentLocation || allowMapClick">
+        <button 
+          *ngIf="showCurrentLocation" 
+          mat-mini-fab 
+          color="primary" 
+          class="location-btn"
+          (click)="getCurrentLocation()"
+          matTooltip="Get Current Location">
+          <mat-icon>my_location</mat-icon>
+        </button>
+      </div>
+    </div>

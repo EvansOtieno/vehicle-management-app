@@ -58,9 +58,20 @@ export const routes: Routes = [
           }
           
         ]
+      },
+
+      // Vehicle routes add navigation to vehicle/add
+      {
+        path: 'vehicle/add',
+        canActivate: [() => roleGuardFn(['ROLE_CAR_OWNER' as UserRole])],
+        loadComponent: () => import('./features/vehicle/add-vehicle/add-vehicle.component').then(m => m.AddVehicleComponent)
+      },
+      {
+        path: 'vehicle/booking/:vehicleId',
+        canActivate: [() => roleGuardFn(['ROLE_CAR_OWNER' as UserRole])],
+        loadComponent: () => import('./features/car-owner/booking/booking-form/booking-form.component').then(m => m.BookingFormComponent)
       }
 
-      // Vehicle routes
       
     ]
   },

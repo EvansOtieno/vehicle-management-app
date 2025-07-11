@@ -1,6 +1,8 @@
 export interface Location {
-  latitude: number;
-  longitude: number;
+  coordinates: {
+    type: 'Point';
+    coordinates: [number, number]; // [longitude, latitude]
+  };
   address: string;
   city: string;
   state: string;

@@ -52,7 +52,7 @@ export interface MechanicProfile {
   description: string;
   specializations: string[];
   yearsOfExperience: number;
-  location: import('./location.model').Location;
+  location: import('./location.models').Location;
   contactPhone: string;
   contactEmail: string;
   website?: string;

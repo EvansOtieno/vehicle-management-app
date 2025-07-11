@@ -4,7 +4,7 @@
   <div class="dashboard-section">
     <div class="section-header">
       <h3>My Vehicles</h3>
-      <button class="add-btn" routerLink="/vehicles/add">Add New Vehicle</button>
+      <button class="add-btn"  (click)="addVehicle()">Add New Vehicle</button>
     </div>
     
     <div *ngIf="isLoading" class="loading-state">
@@ -31,7 +31,7 @@
         </div>
         <div class="vehicle-actions">
           <button class="action-btn">Service History</button>
-          <button class="action-btn">Schedule Service</button>
+          <button class="action-btn" (click)="bookService(car.vin)">Schedule Service</button>
         </div>
       </div>
       

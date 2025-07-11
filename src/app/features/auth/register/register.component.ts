@@ -19,7 +19,7 @@ export class RegisterComponent {
   errorMessage = '';
   userRoles: { value: string, label: string }[] = [
     { value: 'ROLE_CAR_OWNER', label: 'Car Owner' },
-    { value: 'ROLE_ADMIN', label: 'Admin' },
+    //{ value: 'ROLE_ADMIN', label: 'Admin' },
     { value: 'ROLE_MECHANIC', label: 'Mechanic' },
     { value: 'ROLE_PART_DEALER', label: 'Part Dealer' }
   ];

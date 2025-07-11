@@ -11,7 +11,8 @@ export const API_ENDPOINTS = {
   CAR_OWNER: `${API_BASE_URL_USER}/api/car-owner`,
   ADMIN_PROFILES: `${API_BASE_URL_USER}/api/admin`,
   VEHICLE_REGISTER: `${API_BASE_URL_VEHICLE}/api/vehicles/register`,
-  VEHICLE_LIST: `${API_BASE_URL_VEHICLE}/api/vehicles`
+  VEHICLE_LIST: `${API_BASE_URL_VEHICLE}/api/vehicles`,
+  SERVICE_PROVIDERS: `${API_BASE_URL_USER}/api/service-providers`,
   
 };
 

@@ -1,0 +1,393 @@
+<div class="booking-container">
+  <!-- Header -->
+  <div class="booking-header">
+    <button mat-icon-button (click)="goBack()" class="back-button">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>Book Vehicle Service</h1>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading && !vehicle" class="main-loading">
+    <mat-spinner diameter="60"></mat-spinner>
+    <p>Loading vehicle details...</p>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading || vehicle" class="booking-content">
+    <mat-card class="booking-card">
+      <mat-card-header>
+        <mat-card-title>Schedule Service for {{ vehicle?.registrationNumber }}</mat-card-title>
+        <mat-card-subtitle>{{ vehicle?.make }} {{ vehicle?.model }} ({{ vehicle?.year }})</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <mat-stepper #stepper linear="true" orientation="horizontal">
+          
+          <!-- Step 1: Vehicle Details -->
+          <mat-step [stepControl]="vehicleDetailsForm" label="Vehicle Details" [completed]="isStepValid(0)">
+            <div class="step-content">
+              <h2>Vehicle Information</h2>
+              <p class="step-description">Review your vehicle details below</p>
+
+              <form [formGroup]="vehicleDetailsForm" class="vehicle-form">
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Registration Number</mat-label>
+                    <input matInput formControlName="registrationNumber" readonly>
+                    <mat-icon matSuffix>directions_car</mat-icon>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Make</mat-label>
+                    <input matInput formControlName="make" readonly>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Model</mat-label>
+                    <input matInput formControlName="model" readonly>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Year</mat-label>
+                    <input matInput formControlName="year" readonly>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Registration Location</mat-label>
+                    <textarea matInput formControlName="registrationLocation" rows="2" readonly></textarea>
+                    <mat-icon matSuffix>location_on</mat-icon>
+                  </mat-form-field>
+                </div>
+              </form>
+
+              <div class="step-actions">
+                <button mat-raised-button color="primary" matStepperNext [disabled]="!isStepValid(0)">
+                  Next: Select Provider
+                </button>
+              </div>
+            </div>
+          </mat-step>
+
+          <!-- Step 2: Service Provider Selection -->
+          <mat-step label="Select Provider" [completed]="isStepValid(1)">
+            <div class="step-content">
+              <h2>Choose a Service Provider</h2>
+              <p class="step-description">Click on a marker to select a service provider near your vehicle's location</p>
+
+              <div class="map-section">
+                <app-map
+                  mode="service-booking"
+                  [height]="'450px'"
+                  [vehicleLocation]="vehicleLocation"
+                  [serviceProviders]="serviceProviders"
+                  [selectedMarkerId]="selectedMarkerId"
+                  [loading]="mapLoading"
+                  (markerClick)="onProviderMarkerClick($event)">
+                </app-map>
+              </div>
+
+              <!-- Selected Provider Info -->
+              <div *ngIf="selectedServiceProvider" class="provider-info">
+                <mat-card class="provider-card selected">
+                  <mat-card-header>
+                    <mat-icon mat-card-avatar class="provider-avatar">garage</mat-icon>
+                    <mat-card-title>{{ selectedServiceProvider.name }}</mat-card-title>
+                    <mat-card-subtitle>
+                        <div class="rating">
+                        <mat-icon class="star">star</mat-icon>
+                        <span>{{ selectedServiceProvider.rating }}/5</span>
+                        <!--<span class="distance">({{ getProviderDistance(selectedServiceProvider).toFixed(1) }} km away)</span>-->
+                      </div>
+                    </mat-card-subtitle>
+                  </mat-card-header>
+                  
+                  <mat-card-content>
+                    <div class="provider-details">
+                      <div class="detail-item">
+                        <mat-icon>location_on</mat-icon>
+                        <span>{{ selectedServiceProvider.location.address }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <mat-icon>phone</mat-icon>
+                        <span>{{ selectedServiceProvider.phoneNumber }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <mat-icon>email</mat-icon>
+                        <span>{{ selectedServiceProvider.email }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <mat-icon>schedule</mat-icon>
+                        <span>{{ selectedServiceProvider.workingHours }}</span>
+                      </div>
+                    </div>
+
+                    <div class="services-section">
+                      <h4>Available Services:</h4>
+                      <div class="services-chips">
+                        <mat-chip-listbox>
+                          <mat-chip *ngFor="let service of selectedServiceProvider.services" disabled>
+                            {{ service }}
+                          </mat-chip>
+                        </mat-chip-listbox>
+                      </div>
+                    </div>
+
+                    <div class="description-section">
+                      <p class="description">{{ selectedServiceProvider.description }}</p>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+
+              <!-- No Provider Selected Message -->
+              <div *ngIf="!selectedServiceProvider && serviceProviders.length > 0" class="no-selection">
+                <mat-card class="info-card">
+                  <mat-card-content>
+                    <div class="info-content">
+                      <mat-icon class="info-icon">info</mat-icon>
+                      <div>
+                        <h3>Select a Service Provider</h3>
+                        <p>Click on any garage marker on the map to view details and select your preferred service provider.</p>
+                      </div>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+
+              <!-- No Providers Found Message -->
+              <div *ngIf="!mapLoading && serviceProviders.length === 0" class="no-providers">
+                <mat-card class="warning-card">
+                  <mat-card-content>
+                    <div class="warning-content">
+                      <mat-icon class="warning-icon">warning</mat-icon>
+                      <div>
+                        <h3>No Service Providers Found</h3>
+                        <p>We couldn't find any service providers within 20km of your vehicle's location. Please try expanding your search or contact support.</p>
+                      </div>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+
+              <div class="step-actions">
+                <button mat-button matStepperPrevious>Back</button>
+                <button 
+                  mat-raised-button 
+                  color="primary" 
+                  matStepperNext 
+                  [disabled]="!isStepValid(1)">
+                  Next: Customer Details
+                </button>
+              </div>
+            </div>
+          </mat-step>
+
+          <!-- Step 3: Customer Details -->
+          <mat-step [stepControl]="customerDetailsForm" label="Customer Details" [completed]="isStepValid(2)">
+            <div class="step-content">
+              <h2>Your Contact Information</h2>
+              <p class="step-description">Please provide your contact details for service coordination</p>
+
+              <form [formGroup]="customerDetailsForm" class="customer-form">
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Full Name</mat-label>
+                    <input matInput formControlName="name" placeholder="Enter your full name">
+                    <mat-icon matSuffix>person</mat-icon>
+                    <mat-error *ngIf="getFieldError(customerDetailsForm, 'name')">
+                      {{ getFieldError(customerDetailsForm, 'name') }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Phone Number</mat-label>
+                    <input matInput formControlName="phone" placeholder="0700000000" type="tel">
+                    <mat-icon matSuffix>phone</mat-icon>
+                    <mat-error *ngIf="getFieldError(customerDetailsForm, 'phone')">
+                      {{ getFieldError(customerDetailsForm, 'phone') }}
+                    </mat-error>
+                  </mat-form-field>
+                  
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Email Address</mat-label>
+                    <input matInput formControlName="email" placeholder="your@email.com" type="email">
+                    <mat-icon matSuffix>email</mat-icon>
+                    <mat-error *ngIf="getFieldError(customerDetailsForm, 'email')">
+                      {{ getFieldError(customerDetailsForm, 'email') }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </form>
+
+              <div class="step-actions">
+                <button mat-button matStepperPrevious>Back</button>
+                <button 
+                  mat-raised-button 
+                  color="primary" 
+                  matStepperNext 
+                  [disabled]="!isStepValid(2)">
+                  Next: Service Details
+                </button>
+              </div>
+            </div>
+          </mat-step>
+
+          <!-- Step 4: Service Details -->
+          <mat-step [stepControl]="serviceDetailsForm" label="Service Details" [completed]="isStepValid(3)">
+            <div class="step-content">
+              <h2>Service Information</h2>
+              <p class="step-description">When would you like to schedule the service and what issues are you experiencing?</p>
+
+              <form [formGroup]="serviceDetailsForm" class="service-form">
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Preferred Date</mat-label>
+                    <input matInput [matDatepicker]="picker" formControlName="preferredDate">
+                    <mat-hint>Select your preferred service date</mat-hint>
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker [startAt]="startDate"></mat-datepicker>
+                    <mat-error *ngIf="getFieldError(serviceDetailsForm, 'preferredDate')">
+                      {{ getFieldError(serviceDetailsForm, 'preferredDate') }}
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Preferred Time</mat-label>
+                    <mat-select formControlName="preferredTime">
+                      <mat-option *ngFor="let slot of timeSlots" [value]="slot.value">
+                        {{ slot.label }}
+                      </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="getFieldError(serviceDetailsForm, 'preferredTime')">
+                      {{ getFieldError(serviceDetailsForm, 'preferredTime') }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Issue Description</mat-label>
+                    <textarea 
+                      matInput 
+                      formControlName="issueDescription" 
+                      rows="4" 
+                      placeholder="Describe the issues you're experiencing with your vehicle in detail..."
+                      maxlength="500">
+                    </textarea>
+                    <mat-hint align="end">
+                      {{ serviceDetailsForm.get('issueDescription')?.value?.length || 0 }}/500
+                    </mat-hint>
+                    <mat-error *ngIf="getFieldError(serviceDetailsForm, 'issueDescription')">
+                      {{ getFieldError(serviceDetailsForm, 'issueDescription') }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </form>
+
+              <div class="step-actions">
+                <button mat-button matStepperPrevious>Back</button>
+                <button 
+                  mat-raised-button 
+                  color="primary" 
+                  matStepperNext 
+                  [disabled]="!isStepValid(3)">
+                  Review Booking
+                </button>
+              </div>
+            </div>
+          </mat-step>
+
+          <!-- Step 5: Confirmation -->
+          <mat-step label="Confirmation">
+            <div class="step-content">
+              <h2>Review Your Booking</h2>
+              <p class="step-description">Please review all details before submitting your service request</p>
+
+              <div class="confirmation-section">
+                <mat-card class="summary-card">
+                  <mat-card-header>
+                    <mat-card-title>
+                      <mat-icon>assignment</mat-icon>
+                      Booking Summary
+                    </mat-card-title>
+                  </mat-card-header>
+                  
+                  <mat-card-content>
+                    <div class="summary-grid">
+                      <!-- Vehicle Information -->
+                      <div class="summary-section">
+                        <h4><mat-icon>directions_car</mat-icon> Vehicle</h4>
+                        <div class="summary-details">
+                          <p><strong>{{ vehicle?.registrationNumber }}</strong></p>
+                          <p>{{ vehicle?.make }} {{ vehicle?.model }} ({{ vehicle?.year }})</p>
+                        </div>
+                      </div>
+
+                      <!-- Service Provider -->
+                      <div class="summary-section">
+                        <h4><mat-icon>garage</mat-icon> Service Provider</h4>
+                        <div class="summary-details">
+                          <p><strong>{{ selectedServiceProvider?.name }}</strong></p>
+                          <p>{{ selectedServiceProvider?.location?.address }}</p>
+                          <p>{{ selectedServiceProvider?.phoneNumber }}</p>
+                        </div>
+                      </div>
+
+                      <!-- Appointment -->
+                      <div class="summary-section">
+                        <h4><mat-icon>event</mat-icon> Appointment</h4>
+                        <div class="summary-details">
+                          <p><strong>{{ formatDate(serviceDetailsForm.value.preferredDate) }}</strong></p>
+                          <p>{{ formatTime(serviceDetailsForm.value.preferredTime) }}</p>
+                        </div>
+                      </div>
+
+                      <!-- Customer -->
+                      <div class="summary-section">
+                        <h4><mat-icon>person</mat-icon> Customer</h4>
+                        <div class="summary-details">
+                          <p><strong>{{ customerDetailsForm.value.name }}</strong></p>
+                          <p>{{ customerDetailsForm.value.phone }}</p>
+                          <p>{{ customerDetailsForm.value.email }}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Issue Description -->
+                    <div class="issue-summary">
+                      <h4><mat-icon>description</mat-icon> Issue Description</h4>
+                      <div class="issue-text">
+                        {{ serviceDetailsForm.value.issueDescription }}
+                      </div>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+
+              <div class="confirmation-actions">
+                <button mat-button matStepperPrevious [disabled]="loading">Back</button>
+                <button 
+                  mat-raised-button 
+                  color="primary" 
+                  (click)="onSubmitBooking()"
+                  [disabled]="!canProceedToConfirmation() || loading">
+                  <mat-spinner *ngIf="loading" diameter="20" class="button-spinner"></mat-spinner>
+                  <span *ngIf="!loading">Confirm Booking</span>
+                  <span *ngIf="loading">Submitting...</span>
+                </button>
+              </div>
+            </div>
+          </mat-step>
+        </mat-stepper>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

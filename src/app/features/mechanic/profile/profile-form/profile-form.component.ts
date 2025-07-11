@@ -14,7 +14,7 @@ import {
   Certification,
   BusinessType 
 } from '../../../../core/models/mechanic-profile.model';
-import { Location } from '../../../../core/models/location.model';
+import { Location } from '../../../../core/models/location.models';
 import { MechanicProfileService } from '../../../../core/services/user/mechanic/mechanic-profile.service';
 import { TokenService } from '../../../../core/services/token/token.service';
 
@@ -194,15 +194,20 @@ export class ProfileFormComponent implements OnInit, OnDestroy {
       contactEmail: ['', [Validators.required, Validators.email]],
       website: [''],
       
-      // Location
+      // Location - Updated for GeoJSON format
       location: this.fb.group({
+        coordinates: this.fb.group({
+          type: ['Point', Validators.required],
+          coordinates: [
+            [0, 0], // [longitude, latitude] format
+            [Validators.required, Validators.minLength(2)]
+          ]
+        }),
         address: ['', Validators.required],
         city: ['', Validators.required],
         state: ['', Validators.required],
         zipCode: ['', Validators.required],
-        country: ['Kenya', Validators.required],
-        latitude: [0, Validators.required],
-        longitude: [0, Validators.required]
+        country: ['Kenya', Validators.required]
       }),
       
       // Services
@@ -275,12 +280,10 @@ export class ProfileFormComponent implements OnInit, OnDestroy {
 
     this.selectedLocation = profile.location;
     
-    // Update map if it's loaded
-    if (this.map && profile.location) {
-      const position = { 
-        lat: profile.location.latitude, 
-        lng: profile.location.longitude 
-      };
+    // Update map if it's loaded and location exists
+    if (this.map && profile.location && profile.location.coordinates) {
+      const [lng, lat] = profile.location.coordinates.coordinates;
+      const position = { lat, lng };
       this.map.setCenter(position);
       this.marker.setPosition(position);
     }
@@ -404,11 +407,9 @@ export class ProfileFormComponent implements OnInit, OnDestroy {
           });
 
           // Set initial location if available
-          if (this.selectedLocation && this.selectedLocation.latitude && this.selectedLocation.longitude) {
-            const position = { 
-              lat: this.selectedLocation.latitude, 
-              lng: this.selectedLocation.longitude 
-            };
+          if (this.selectedLocation?.coordinates?.coordinates) {
+            const [lng, lat] = this.selectedLocation.coordinates.coordinates;
+            const position = { lat, lng };
             this.map.setCenter(position);
             this.marker.setPosition(position);
           } else {
@@ -498,8 +499,10 @@ export class ProfileFormComponent implements OnInit, OnDestroy {
 
   private updateLocationFromCoordinatesSimple(lat: number, lng: number): void {
     const location: Location = {
-      latitude: lat,
-      longitude: lng,
+      coordinates: {
+        type: 'Point',
+        coordinates: [lng, lat] // GeoJSON format: [longitude, latitude]
+      },
       address: `${lat.toFixed(6)}, ${lng.toFixed(6)}`,
       city: 'Nairobi',
       state: 'Nairobi County',
@@ -520,8 +523,10 @@ export class ProfileFormComponent implements OnInit, OnDestroy {
     };
 
     return {
-      latitude: lat,
-      longitude: lng,
+      coordinates: {
+        type: 'Point',
+        coordinates: [lng, lat] // GeoJSON format: [longitude, latitude]
+      },
       address: result.formatted_address || `${lat.toFixed(6)}, ${lng.toFixed(6)}`,
       city: getComponent('locality') || getComponent('administrative_area_level_2') || 'Nairobi',
       state: getComponent('administrative_area_level_1') || 'Nairobi County',
@@ -549,13 +554,23 @@ export class ProfileFormComponent implements OnInit, OnDestroy {
           this.profileForm.patchValue({ location: parsedLocation });
           
           if (this.map) {
-            const position = { lat: parsedLocation.latitude, lng: parsedLocation.longitude };
+            const [lng, lat] = parsedLocation.coordinates.coordinates;
+            const position = { lat, lng };
             this.map.setCenter(position);
             this.marker.setPosition(position);
           }
         }
       });
     }
+  }
+
+  // Helper method to get lat/lng from the new location format
+  private getLatLngFromLocation(location: Location): { lat: number, lng: number } | null {
+    if (location?.coordinates?.coordinates && location.coordinates.coordinates.length >= 2) {
+      const [lng, lat] = location.coordinates.coordinates;
+      return { lat, lng };
+    }
+    return null;
   }
 
   // Form submission
